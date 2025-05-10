@@ -59,12 +59,12 @@ byte Midi14 = 71;
 byte Midi15 = 72;
 
 //Distance ranges
-int Gaps = 6;
+int Gaps = 12;
 
 int DMin = 0;
 int D1 = 10;
-int D2 = 10 + (Gaps * 1);
-int D3 = 10 + (Gaps * 2);
+int D2 = 10 + (Gaps * 1) - 2;
+int D3 = 10 + (Gaps * 2) ;
 int D4 = 10 + (Gaps * 3);
 int D5 = 10 + (Gaps * 4);
 int D6 = 10 + (Gaps * 5);
@@ -81,6 +81,7 @@ int D16 = 10 + (Gaps * 15);
 
 //Millis variables
 
+unsigned long Time0;
 unsigned long Time1;
 unsigned long Time2;
 unsigned long Time3;
@@ -100,6 +101,9 @@ unsigned long Time15;
 //Note sustain length
 
 int NoteSustain = 2000;
+int NoteDelay = 200;
+
+int RangeGap = 2;
 
 void setup() { //-------------------------------------------------------------SETUP-------------------------------------------------------------
 
@@ -119,7 +123,7 @@ void loop() {
 
  int Distance1 = (DistanceR1 + DistanceR2 + DistanceR3 + DistanceR4 + DistanceR5 + DistanceR6 + DistanceR7 + DistanceR8 + DistanceR9 + DistanceR10) / 10;
 
- if(Distance1 > D16 || Distance1 <= D1){S1State = 0;}
+ if(Distance1 > D16){S1State = 0;}
  if(Distance1 <= D16 && Distance1 >D15){S1State = 1;}
  if(Distance1 <= D15 && Distance1 >D14){S1State = 2;}
  if(Distance1 <= D14 && Distance1 >D13){S1State = 3;}
@@ -138,41 +142,49 @@ void loop() {
 
  if(S1State != S1LastState){
 
+ if(S1State == 0){
+  //MIDI.sendNoteOff(Midi1, 0, 2); MIDI.sendNoteOn(Midi1, 100, 2);
+  DmxSimple.write(1, 0); DmxSimple.write(4, 0); DmxSimple.write(7, 0); DmxSimple.write(10, 0); DmxSimple.write(13, 0); DmxSimple.write(16, 0); DmxSimple.write(19, 0); DmxSimple.write(22, 0);
+   DmxSimple.write(2, 0); DmxSimple.write(5, 0); DmxSimple.write(8, 0); DmxSimple.write(11, 0); DmxSimple.write(14, 0); DmxSimple.write(17, 0); DmxSimple.write(20, 0); DmxSimple.write(23, 0);
+    DmxSimple.write(3, 0); DmxSimple.write(6, 0); DmxSimple.write(9, 0); DmxSimple.write(12, 0); DmxSimple.write(15, 0); DmxSimple.write(18, 0); DmxSimple.write(21, 0); DmxSimple.write(24, 0);
+  Time0 = millis(); delay(NoteDelay);}
+
+
   //------------------------------------------------------------------------------------------------------------------------------------BLUE SECTIONS------------------------------------------------------------------------------------------------------------------------------------
   if(S1State == 1){
   MIDI.sendNoteOff(Midi1, 0, 2); MIDI.sendNoteOn(Midi1, 100, 2);
   DmxSimple.write(1, 0); DmxSimple.write(4, 0); DmxSimple.write(7, 0); DmxSimple.write(10, 0); DmxSimple.write(13, 0); DmxSimple.write(16, 0); DmxSimple.write(19, 0); DmxSimple.write(22, 0);
    DmxSimple.write(2, 0); DmxSimple.write(5, 0); DmxSimple.write(8, 0); DmxSimple.write(11, 0); DmxSimple.write(14, 0); DmxSimple.write(17, 0); DmxSimple.write(20, 0); DmxSimple.write(23, 0);
     DmxSimple.write(3, 255); DmxSimple.write(6, 170); DmxSimple.write(9, 85); DmxSimple.write(12, 0); DmxSimple.write(15, 0); DmxSimple.write(18, 0); DmxSimple.write(21, 0); DmxSimple.write(24, 0);
-  Time1 = millis();}
+  Time1 = millis(); delay(NoteDelay);}
 
   if(S1State == 2){
   MIDI.sendNoteOff(Midi2, 0, 2); MIDI.sendNoteOn(Midi2, 100, 2);
   DmxSimple.write(1, 0); DmxSimple.write(4, 0); DmxSimple.write(7, 0); DmxSimple.write(10, 0); DmxSimple.write(13, 0); DmxSimple.write(16, 0); DmxSimple.write(19, 0); DmxSimple.write(22, 0);
    DmxSimple.write(2, 0); DmxSimple.write(5, 0); DmxSimple.write(8, 0); DmxSimple.write(11, 0); DmxSimple.write(14, 0); DmxSimple.write(17, 0); DmxSimple.write(20, 0); DmxSimple.write(23, 0);
     DmxSimple.write(3, 255); DmxSimple.write(6, 255); DmxSimple.write(9, 255); DmxSimple.write(12, 170); DmxSimple.write(15, 85); DmxSimple.write(18, 0); DmxSimple.write(21, 0); DmxSimple.write(24, 0);
-  Time2 = millis();}
+  Time2 = millis(); delay(NoteDelay);}
 
   if(S1State == 3){
   MIDI.sendNoteOff(Midi3, 0, 2); MIDI.sendNoteOn(Midi3, 100, 2);
   DmxSimple.write(1, 0); DmxSimple.write(4, 0); DmxSimple.write(7, 0); DmxSimple.write(10, 0); DmxSimple.write(13, 0); DmxSimple.write(16, 0); DmxSimple.write(19, 0); DmxSimple.write(22, 0);
    DmxSimple.write(2, 0); DmxSimple.write(5, 0); DmxSimple.write(8, 0); DmxSimple.write(11, 0); DmxSimple.write(14, 0); DmxSimple.write(17, 0); DmxSimple.write(20, 0); DmxSimple.write(23, 0);
     DmxSimple.write(3, 255); DmxSimple.write(6, 255); DmxSimple.write(9, 255); DmxSimple.write(12, 255); DmxSimple.write(15, 170); DmxSimple.write(18, 85); DmxSimple.write(21, 0); DmxSimple.write(24, 0);
-  Time3 = millis();}
+  Time3 = millis(); delay(NoteDelay);}
 
   if(S1State == 4){
   MIDI.sendNoteOff(Midi4, 0, 2); MIDI.sendNoteOn(Midi4, 100, 2);
   DmxSimple.write(1, 0); DmxSimple.write(4, 0); DmxSimple.write(7, 0); DmxSimple.write(10, 0); DmxSimple.write(13, 0); DmxSimple.write(16, 0); DmxSimple.write(19, 0); DmxSimple.write(22, 0);
    DmxSimple.write(2, 0); DmxSimple.write(5, 0); DmxSimple.write(8, 0); DmxSimple.write(11, 0); DmxSimple.write(14, 0); DmxSimple.write(17, 0); DmxSimple.write(20, 0); DmxSimple.write(23, 0);
     DmxSimple.write(3, 255); DmxSimple.write(6, 255); DmxSimple.write(9, 255); DmxSimple.write(12, 255); DmxSimple.write(15, 255); DmxSimple.write(18, 255); DmxSimple.write(21, 170); DmxSimple.write(24, 85);
-  Time4 = millis();}
+  Time4 = millis(); delay(NoteDelay);}
 
   if(S1State == 5){
   MIDI.sendNoteOff(Midi5, 0, 2); MIDI.sendNoteOn(Midi5, 100, 2);
   DmxSimple.write(1, 0); DmxSimple.write(4, 0); DmxSimple.write(7, 0); DmxSimple.write(10, 0); DmxSimple.write(13, 0); DmxSimple.write(16, 0); DmxSimple.write(19, 0); DmxSimple.write(22, 0);
    DmxSimple.write(2, 85); DmxSimple.write(5, 0); DmxSimple.write(8, 0); DmxSimple.write(11, 0); DmxSimple.write(14, 0); DmxSimple.write(17, 0); DmxSimple.write(20, 0); DmxSimple.write(23, 0);
     DmxSimple.write(3, 170); DmxSimple.write(6, 255); DmxSimple.write(9, 255); DmxSimple.write(12, 255); DmxSimple.write(15, 255); DmxSimple.write(18, 255); DmxSimple.write(21, 255); DmxSimple.write(24, 255);
-  Time5 = millis();}
+  Time5 = millis(); delay(NoteDelay);}
 
   //------------------------------------------------------------------------------------------------------------------------------------GREEN SECTIONS------------------------------------------------------------------------------------------------------------------------------------
 
@@ -181,35 +193,35 @@ void loop() {
   DmxSimple.write(1, 0); DmxSimple.write(4, 0); DmxSimple.write(7, 0); DmxSimple.write(10, 0); DmxSimple.write(13, 0); DmxSimple.write(16, 0); DmxSimple.write(19, 0); DmxSimple.write(22, 0);
    DmxSimple.write(2, 255); DmxSimple.write(5, 170); DmxSimple.write(8, 85); DmxSimple.write(11, 0); DmxSimple.write(14, 0); DmxSimple.write(17, 0); DmxSimple.write(20, 0); DmxSimple.write(23, 0);
     DmxSimple.write(3, 0); DmxSimple.write(6, 85); DmxSimple.write(9, 170); DmxSimple.write(12, 255); DmxSimple.write(15, 255); DmxSimple.write(18, 255); DmxSimple.write(21, 255); DmxSimple.write(24, 255);
-  Time6 = millis();}
+  Time6 = millis(); delay(NoteDelay);}
 
   if(S1State == 7){
   MIDI.sendNoteOff(Midi7, 0, 2); MIDI.sendNoteOn(Midi7, 100, 2);
   DmxSimple.write(1, 0); DmxSimple.write(4, 0); DmxSimple.write(7, 0); DmxSimple.write(10, 0); DmxSimple.write(13, 0); DmxSimple.write(16, 0); DmxSimple.write(19, 0); DmxSimple.write(22, 0);
    DmxSimple.write(2, 255); DmxSimple.write(5, 255); DmxSimple.write(8, 255); DmxSimple.write(11, 170); DmxSimple.write(14, 85); DmxSimple.write(17, 0); DmxSimple.write(20, 0); DmxSimple.write(23, 0);
     DmxSimple.write(3, 0); DmxSimple.write(6, 0); DmxSimple.write(9, 0); DmxSimple.write(12, 85); DmxSimple.write(15, 170); DmxSimple.write(18, 255); DmxSimple.write(21, 255); DmxSimple.write(24, 255);
-  Time7 = millis();}
+  Time7 = millis(); delay(NoteDelay);}
 
   if(S1State == 8){
   MIDI.sendNoteOff(Midi8, 0, 2); MIDI.sendNoteOn(Midi8, 100, 2);
   DmxSimple.write(1, 0); DmxSimple.write(4, 0); DmxSimple.write(7, 0); DmxSimple.write(10, 0); DmxSimple.write(13, 0); DmxSimple.write(16, 0); DmxSimple.write(19, 0); DmxSimple.write(22, 0);
    DmxSimple.write(2, 255); DmxSimple.write(5, 255); DmxSimple.write(8, 255); DmxSimple.write(11, 255); DmxSimple.write(14, 170); DmxSimple.write(17, 85); DmxSimple.write(20, 0); DmxSimple.write(23, 0);
     DmxSimple.write(3, 0); DmxSimple.write(6, 0); DmxSimple.write(9, 0); DmxSimple.write(12, 0); DmxSimple.write(15, 85); DmxSimple.write(18, 170); DmxSimple.write(21, 255); DmxSimple.write(24, 255);
-  Time8 = millis();}
+  Time8 = millis(); delay(NoteDelay);}
 
   if(S1State == 9){
   MIDI.sendNoteOff(Midi9, 0, 2); MIDI.sendNoteOn(Midi9, 100, 2);
   DmxSimple.write(1, 0); DmxSimple.write(4, 0); DmxSimple.write(7, 0); DmxSimple.write(10, 0); DmxSimple.write(13, 0); DmxSimple.write(16, 0); DmxSimple.write(19, 0); DmxSimple.write(22, 0);
    DmxSimple.write(2, 255); DmxSimple.write(5, 255); DmxSimple.write(8, 255); DmxSimple.write(11, 255); DmxSimple.write(14, 255); DmxSimple.write(17, 255); DmxSimple.write(20, 170); DmxSimple.write(23, 85);
     DmxSimple.write(3, 0); DmxSimple.write(6, 0); DmxSimple.write(9, 0); DmxSimple.write(12, 0); DmxSimple.write(15, 0); DmxSimple.write(18, 0); DmxSimple.write(21, 85); DmxSimple.write(24, 170);
-  Time9 = millis();}
+  Time9 = millis(); delay(NoteDelay);}
 
   if(S1State == 10){
   MIDI.sendNoteOff(Midi10, 0, 2); MIDI.sendNoteOn(Midi10, 100, 2);
   DmxSimple.write(1, 85); DmxSimple.write(4, 0); DmxSimple.write(7, 0); DmxSimple.write(10, 0); DmxSimple.write(13, 0); DmxSimple.write(16, 0); DmxSimple.write(19, 0); DmxSimple.write(22, 0);
    DmxSimple.write(2, 170); DmxSimple.write(5, 255); DmxSimple.write(8, 255); DmxSimple.write(11, 255); DmxSimple.write(14, 255); DmxSimple.write(17, 255); DmxSimple.write(20, 255); DmxSimple.write(23, 170);
     DmxSimple.write(3, 0); DmxSimple.write(6, 0); DmxSimple.write(9, 0); DmxSimple.write(12, 0); DmxSimple.write(15, 0); DmxSimple.write(18, 0); DmxSimple.write(21, 0); DmxSimple.write(24, 85);
-  Time10 = millis();}
+  Time10 = millis(); delay(NoteDelay);}
 
   //------------------------------------------------------------------------------------------------------------------------------------RED SECTIONS------------------------------------------------------------------------------------------------------------------------------------
 
@@ -218,35 +230,35 @@ void loop() {
   DmxSimple.write(1, 255); DmxSimple.write(4, 170); DmxSimple.write(7, 85); DmxSimple.write(10, 0); DmxSimple.write(13, 0); DmxSimple.write(16, 0); DmxSimple.write(19, 0); DmxSimple.write(22, 0);
    DmxSimple.write(2, 0); DmxSimple.write(5, 85); DmxSimple.write(8, 170); DmxSimple.write(11, 255); DmxSimple.write(14, 255); DmxSimple.write(17, 255); DmxSimple.write(20, 255); DmxSimple.write(23, 255);
     DmxSimple.write(3, 0); DmxSimple.write(6, 0); DmxSimple.write(9, 0); DmxSimple.write(12, 0); DmxSimple.write(15, 0); DmxSimple.write(18, 0); DmxSimple.write(21, 0); DmxSimple.write(24, 0);
-  Time11 = millis();}
+  Time11 = millis(); delay(NoteDelay);}
 
   if(S1State == 12){
   MIDI.sendNoteOff(Midi12, 0, 2); MIDI.sendNoteOn(Midi12, 100, 2);
   DmxSimple.write(1, 255); DmxSimple.write(4, 255); DmxSimple.write(7, 255); DmxSimple.write(10, 170); DmxSimple.write(13, 85); DmxSimple.write(16, 0); DmxSimple.write(19, 0); DmxSimple.write(22, 0);
    DmxSimple.write(2, 0); DmxSimple.write(5, 0); DmxSimple.write(8, 0); DmxSimple.write(11, 85); DmxSimple.write(14, 170); DmxSimple.write(17, 255); DmxSimple.write(20, 255); DmxSimple.write(23, 255);
     DmxSimple.write(3, 0); DmxSimple.write(6, 0); DmxSimple.write(9, 0); DmxSimple.write(12, 0); DmxSimple.write(15, 0); DmxSimple.write(18, 0); DmxSimple.write(21, 0); DmxSimple.write(24, 0);
-  Time12 = millis();}
+  Time12 = millis(); delay(NoteDelay);}
 
   if(S1State == 13){
   MIDI.sendNoteOff(Midi13, 0, 2); MIDI.sendNoteOn(Midi13, 100, 2);
   DmxSimple.write(1, 255); DmxSimple.write(4, 255); DmxSimple.write(7, 255); DmxSimple.write(10, 255); DmxSimple.write(13, 170); DmxSimple.write(16, 85); DmxSimple.write(19, 0); DmxSimple.write(22, 0);
    DmxSimple.write(2, 0); DmxSimple.write(5, 0); DmxSimple.write(8, 0); DmxSimple.write(11, 0); DmxSimple.write(14, 85); DmxSimple.write(17, 170); DmxSimple.write(20, 255); DmxSimple.write(23, 255);
     DmxSimple.write(3, 0); DmxSimple.write(6, 0); DmxSimple.write(9, 0); DmxSimple.write(12, 0); DmxSimple.write(15, 0); DmxSimple.write(18, 0); DmxSimple.write(21, 0); DmxSimple.write(24, 0);
-  Time13 = millis();}
+  Time13 = millis(); delay(NoteDelay);}
 
   if(S1State == 14){
   MIDI.sendNoteOff(Midi14, 0, 2); MIDI.sendNoteOn(Midi14, 100, 2);
   DmxSimple.write(1, 255); DmxSimple.write(4, 255); DmxSimple.write(7, 255); DmxSimple.write(10, 255); DmxSimple.write(13, 255); DmxSimple.write(16, 255); DmxSimple.write(19, 170); DmxSimple.write(22, 85);
    DmxSimple.write(2, 0); DmxSimple.write(5, 0); DmxSimple.write(8, 0); DmxSimple.write(11, 0); DmxSimple.write(14, 0); DmxSimple.write(17, 0); DmxSimple.write(20, 85); DmxSimple.write(23, 170);
     DmxSimple.write(3, 0); DmxSimple.write(6, 0); DmxSimple.write(9, 0); DmxSimple.write(12, 0); DmxSimple.write(15, 0); DmxSimple.write(18, 0); DmxSimple.write(21, 0); DmxSimple.write(24, 0);
-  Time14 = millis();}
+  Time14 = millis(); delay(NoteDelay);}
 
   if(S1State == 15){
   MIDI.sendNoteOff(Midi15, 0, 2); MIDI.sendNoteOn(Midi15, 100, 2);
   DmxSimple.write(1, 255); DmxSimple.write(4, 255); DmxSimple.write(7, 255); DmxSimple.write(10, 255); DmxSimple.write(13, 255); DmxSimple.write(16, 255); DmxSimple.write(19, 255); DmxSimple.write(22, 255);
    DmxSimple.write(2, 0); DmxSimple.write(5, 0); DmxSimple.write(8, 0); DmxSimple.write(11, 0); DmxSimple.write(14, 0); DmxSimple.write(17, 0); DmxSimple.write(20, 0); DmxSimple.write(23, 0);
     DmxSimple.write(3, 0); DmxSimple.write(6, 0); DmxSimple.write(9, 0); DmxSimple.write(12, 0); DmxSimple.write(15, 0); DmxSimple.write(18, 0); DmxSimple.write(21, 0); DmxSimple.write(24, 0);
-  Time15 = millis();}
+  Time15 = millis(); delay(NoteDelay);}
 
  }
 
