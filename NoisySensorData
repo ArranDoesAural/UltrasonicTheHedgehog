@@ -101,7 +101,7 @@ unsigned long Time15;
 //Note sustain length
 
 int NoteSustain = 2000;
-int NoteDelay = 200;
+int NoteDelay = 10;
 
 int RangeGap = 2;
 
