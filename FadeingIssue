@@ -1,0 +1,372 @@
+// Included libraries
+
+#include <Ultrasonic.h> // Ultrasonic sensor library
+#include <MIDI.h> // MIDI library
+#include <DmxSimple.h>
+#include <SoftwareSerial.h> // SoftwareSerial library
+
+#define DE_PIN 2 //DE pin on the CQRobot DMX Shield 
+
+SoftwareSerial mySerial(17, 16); // RX, TX
+
+MIDI_CREATE_INSTANCE(SoftwareSerial, mySerial, MIDI);
+
+Ultrasonic ultrasonic1(22, 23);	// Sensor 1 Trig Pin, Echo Pin
+Ultrasonic ultrasonic2(25, 24);	// Sensor 2 Trig Pin, Echo Pin
+Ultrasonic ultrasonic3(27, 26);	// Sensor 3 Trig Pin, Echo Pin
+Ultrasonic ultrasonic4(29, 28);	// Sensor 4 Trig Pin, Echo Pin
+Ultrasonic ultrasonic5(31, 30);	// Sensor 5 Trig Pin, Echo Pin
+Ultrasonic ultrasonic6(33, 32);	// Sensor 6 Trig Pin, Echo Pin
+Ultrasonic ultrasonic7(35, 34);	// Sensor 7 Trig Pin, Echo Pin
+Ultrasonic ultrasonic8(37, 36);	// Sensor 8 Trig Pin, Echo Pin
+
+// Defines S(x)State
+byte S1State;
+byte S2State;
+byte S3State;
+byte S4State;
+byte S5State;
+byte S6State;
+byte S7State;
+byte S8State;
+
+// Defines LastS(x)State
+byte LastS1State;
+byte LastS2State;
+byte LastS3State;
+byte LastS4State;
+byte LastS5State;
+byte LastS6State;
+byte LastS7State;
+byte LastS8State;
+
+//Declare millis Time variables
+
+unsigned long Time1;
+unsigned long Time2;
+unsigned long Time3;
+unsigned long Time4;
+unsigned long Time5;
+unsigned long Time6;
+unsigned long Time7;
+unsigned long Time8;
+
+// DMx fading values
+int Bright1;
+int Bright2;
+int Bright3;
+int Bright4;
+int Bright5;
+int Bright6;
+int Bright7;
+int Bright8;
+
+const int BrightFull = 255;
+
+const int FadeFactor = 10;
+
+void setup() { //--------------------------------------------------------------------- SETUP ---------------------------------------------------------------------
+  Serial.begin(31250);
+  MIDI.begin(MIDI_CHANNEL_OFF);
+
+  DmxSimple.usePin(4);      //TX-io pin on the CQRobot DMX Shield 
+  DmxSimple.maxChannel(8);  //My device has 8 channels
+
+  pinMode(DE_PIN, OUTPUT);
+  digitalWrite(DE_PIN, HIGH);
+}
+
+void loop() { //--------------------------------------------------------------------- LOOP ---------------------------------------------------------------------
+
+ unsigned long NewTime = millis();
+
+ int Distance1 = ultrasonic1.read(); // Defines 'Distance1' as sensor 1 reading
+// delay(5);
+ int Distance2 = ultrasonic2.read(); // Defines 'Distance2' as sensor 2 reading
+//delay(5);
+ int Distance3 = ultrasonic3.read(); // Defines 'Distance3' as sensor 3 reading
+//delay(5);
+ int Distance4 = ultrasonic4.read(); // Defines 'Distance4' as sensor 4 reading
+//delay(5);
+ int Distance5 = ultrasonic5.read(); // Defines 'Distance5' as sensor 5 reading
+//delay(5);
+ int Distance6 = ultrasonic6.read(); // Defines 'Distance6' as sensor 6 reading
+//delay(5);
+ int Distance7 = ultrasonic7.read(); // Defines 'Distance7' as sensor 7 reading
+//delay(5);
+ int Distance8 = ultrasonic8.read(); // Defines 'Distance8' as sensor 8 reading
+//delay(5);
+
+ // Sets the distance values for the ranges
+ byte S0 = 0; // Start range 1
+ byte S1 = 29; // End of range 1
+ byte S2 = 30; // Start of range 2
+ byte S3 = 59; // End of range 2
+ byte S4 = 60; // Start of range 3
+
+ // Sets the MIDI Channel
+
+ byte MidiChan = 1;
+
+ // Sets the delay before note off
+
+ int NoteSustain = 5000;
+
+ // Sets the MIDI note values
+ byte Note1 = 60; // C4 1st octave
+ byte Note2 = 62; // D4
+ byte Note3 = 64; // E4
+ byte Note4 = 65; // F4
+ byte Note5 = 67; // G4
+ byte Note6 = 69; // A4
+ byte Note7 = 71; // B4 
+ byte Note8 = (Note1 + 12); // C5 2nd octave
+ byte Note9 = (Note2 + 12); // D5
+ byte Note10 = (Note3 + 12); // E5
+ byte Note11 = (Note4 + 12); // F5
+ byte Note12 = (Note5 + 12); // G5
+ byte Note13 = (Note6 + 12); // A5
+ byte Note14 = (Note7 + 12); // B5
+ byte Note15 = (Note8 + 12); // C6 3rd octave
+ byte Note16 = (Note9 + 12); // C6 3rd octave
+
+ // -----------------------------------------------------------------------------Sensor States-----------------------------------------------------------------------------
+
+ // Set S1State based on distance of sensor 1
+
+ if(Distance1 >= S0 && Distance1 < S1){S1State = 1;} // If Distance1 is between 0 and S1
+ if(Distance1 >= S2 && Distance1 < S3){S1State = 2;} // If Distance1 is between S2 and S3
+ if(Distance1 > S4){S1State = 0;} // If Distance1 is above 60cm
+
+ // Set S2State based on distance of sensor 2
+
+ if(Distance2 >= S0 && Distance2 < S1){S2State = 1;} // If Distance2 is between 0 and S1
+ if(Distance2 >= S2 && Distance2 < S3){S2State = 2;} // If Distance2 is between S2 and S3
+ if(Distance2 >S4){S2State = 0;} // If Distance2 is above 60cm
+
+ // Set S3State based on distance of sensor 3
+
+ if(Distance3 >= S0 && Distance3 < S1){S3State = 1;} // If Distance3 is between 0 and S1
+ if(Distance3 >= S2 && Distance3 < S3){S3State = 2;} // If Distance3 is between S2 and S3
+ if(Distance3 > S4){S3State = 0;} // If Distance3 is above 60cm
+
+ // Set S4State based on distance of sensor 4
+
+ if(Distance4 >= S0 && Distance4 < S1){S4State = 1;} // If Distance4 is between 0 and S1  
+ if(Distance4 >= S2 && Distance4 < S3){S4State = 2;} // If Distance4 is between S2 and S3
+ if(Distance4 > S4){S4State = 0;} // If Distance4 is above 60cm
+
+ // Set S5State based on distance of sensor 5
+
+ if(Distance5 >= S0 && Distance5 < S1){S5State = 1;} // If Distance5 is between 0 and S1
+ if(Distance5 >= S2 && Distance5 < S3){S5State = 2;} // If Distance5 is between S2 and S3
+ if(Distance5 > S4){S5State = 0;} // If Distance5 is above 60cm
+
+ // Set S6State based on distance of sensor 6
+
+ if(Distance6 >= S0 && Distance6 < S1){S6State = 1;} // If Distance6 is between 0 and S1
+ if(Distance6 >= S2 && Distance6 < S3){S6State = 2;} // If Distance6 is between S2 and S3
+ if(Distance6 > S4){S6State = 0;} // If Distance6 is above 60cm
+
+ // Set S7State based on distance of sensor 7
+
+ if(Distance7 >= S0 && Distance7 < S1){S7State = 1;} // If Distance7 is between 0 and S1
+ if(Distance7 >= S2 && Distance7 < S3){S7State = 2;} // If Distance7 is between S2 and S3
+ if(Distance7 > S4){S7State = 0;} // If Distance7 is above 60cm
+
+ // Set S8State based on distance of sensor 8
+
+ if(Distance8 >= S0 && Distance8 < S1){S8State = 1;} // If Distance8 is between 0 and S1  
+ if(Distance8 >= S2 && Distance8 < S3){S8State = 2;} // If Distance8 is between S2 and S3
+ if(Distance8 > S4){S8State = 0;} // If Distance8 is above 60cm
+
+
+ // -----------------------------------------------------------------------------Sensor 1 Action-----------------------------------------------------------------------------
+
+ if (S1State != LastS1State){ 
+
+  if(S1State == 1){
+   //MIDI.sendNoteOff(Note1, 0, MidiChan); // Turns off MIDI note C
+   MIDI.sendNoteOn(Note1, 100, MidiChan); // Plays MIDI note C
+   DmxSimple.write(1, BrightFull);
+   Time1 = millis();
+   Bright1 = BrightFull;}
+
+  if(S1State == 2){
+   //MIDI.sendNoteOff(Note2, 0, MidiChan); // Turns off MIDI note C
+   MIDI.sendNoteOn(Note2, 100, MidiChan); // Plays MIDI note C
+   DmxSimple.write(1, BrightFull);
+   Time1 = millis();
+   Bright1 = BrightFull;}
+ }
+
+ // -----------------------------------------------------------------------------Sensor 2 Action-----------------------------------------------------------------------------
+
+ if (S2State != LastS2State){ 
+
+  if(S2State == 1){
+   //MIDI.sendNoteOff(Note3, 0, MidiChan); // Turns off MIDI note C
+   MIDI.sendNoteOn(Note3, 100, MidiChan); // Plays MIDI note C
+   DmxSimple.write(2, BrightFull);
+   Time2 = millis();}
+  
+  if(S2State == 2){
+   //MIDI.sendNoteOff(Note4, 0, MidiChan); // Turns off MIDI note C
+   MIDI.sendNoteOn(Note4, 100, MidiChan); // Plays MIDI note C
+   DmxSimple.write(2, BrightFull);
+   Time2 = millis();}
+
+ }
+
+ // -----------------------------------------------------------------------------Sensor 3 Action-----------------------------------------------------------------------------
+
+ if (S3State != LastS3State){ 
+
+  if(S3State == 1){
+   //MIDI.sendNoteOff(Note5, 0, MidiChan); // Turns off MIDI note C
+   MIDI.sendNoteOn(Note5, 100, MidiChan); // Plays MIDI note C
+   DmxSimple.write(3, BrightFull);
+   Time3 = millis();}
+
+  if(S3State == 2){
+   //MIDI.sendNoteOff(Note6, 0, MidiChan); // Turns off MIDI note C
+   MIDI.sendNoteOn(Note6, 100, MidiChan); // Plays MIDI note C
+   DmxSimple.write(3, BrightFull);
+   Time3 = millis();}
+
+ }
+
+ // -----------------------------------------------------------------------------Sensor 4 Action-----------------------------------------------------------------------------
+
+ if (S4State != LastS4State){ 
+
+  if(S4State == 1){
+   //MIDI.sendNoteOff(Note7, 0, MidiChan); // Turns off MIDI note C
+   MIDI.sendNoteOn(Note7, 100, MidiChan); // Plays MIDI note C
+   DmxSimple.write(4, BrightFull);
+   Time4 = millis();}
+
+  if(S4State == 2){
+   //MIDI.sendNoteOff(Note8, 0, MidiChan); // Turns off MIDI note D
+   MIDI.sendNoteOn(Note8, 100, MidiChan); // Plays MIDI note D
+   DmxSimple.write(4, BrightFull);
+   Time4 = millis();}
+
+ }
+
+ // -----------------------------------------------------------------------------Sensor 5 Action-----------------------------------------------------------------------------
+
+ if (S5State != LastS5State){ 
+
+  if(S5State == 1){
+   //MIDI.sendNoteOff(Note9, 0, MidiChan); // Turns off MIDI note C
+   MIDI.sendNoteOn(Note9, 100, MidiChan); // Plays MIDI note C
+   DmxSimple.write(5, BrightFull);
+   Time5 = millis();}
+
+  if(S5State == 2){
+   //MIDI.sendNoteOff(Note10, 0, MidiChan); // Turns off MIDI note D
+   MIDI.sendNoteOn(Note10, 100, MidiChan); // Plays MIDI note D
+   DmxSimple.write(5, BrightFull);
+   Time5 = millis();}
+
+ }
+
+ // -----------------------------------------------------------------------------Sensor 6 Action-----------------------------------------------------------------------------
+
+ if (S6State != LastS6State){
+
+  if(S6State == 1){
+   //MIDI.sendNoteOff(Note11, 0, MidiChan); // Turns off MIDI note C
+   MIDI.sendNoteOn(Note11, 100, MidiChan); // Plays MIDI note C
+   DmxSimple.write(6, BrightFull);
+   Time6 = millis();}
+
+  if(S6State == 2){
+   //MIDI.sendNoteOff(Note12, 0, MidiChan); // Turns off MIDI note D
+   MIDI.sendNoteOn(Note12, 100, MidiChan); // Plays MIDI note D
+   DmxSimple.write(6, BrightFull);
+   Time6 = millis();}
+
+ }
+
+ // -----------------------------------------------------------------------------Sensor 7 Action-----------------------------------------------------------------------------
+
+ if (S7State != LastS7State){ 
+
+  if(S7State == 1){
+   //MIDI.sendNoteOff(Note13, 0, MidiChan); // Turns off MIDI note C
+   MIDI.sendNoteOn(Note13, 100, MidiChan); // Plays MIDI note C
+   DmxSimple.write(7, BrightFull);
+   Time7 = millis();}
+
+  if(S7State == 2){
+   //MIDI.sendNoteOff(Note14, 0, MidiChan); // Turns off MIDI note D
+   MIDI.sendNoteOn(Note14, 100, MidiChan); // Plays MIDI note D
+   DmxSimple.write(7, BrightFull);
+   Time7 = millis();}
+
+ }
+
+ // -----------------------------------------------------------------------------Sensor 8 Action-----------------------------------------------------------------------------
+
+ if (S8State != LastS8State){ 
+
+  if(S8State == 1){
+   //MIDI.sendNoteOff(Note15, 0, MidiChan); // Turns off MIDI note C
+   MIDI.sendNoteOn(Note15, 100, MidiChan); // Plays MIDI note C
+   DmxSimple.write(8, BrightFull);
+   Time8 = millis();}
+
+  if(S8State == 2){
+   //MIDI.sendNoteOff(Note16, 0, MidiChan); // Turns off MIDI note D
+   MIDI.sendNoteOn(Note16, 100, MidiChan); // Plays MIDI note D
+   DmxSimple.write(8, BrightFull);
+   Time8 = millis();}
+
+ }
+
+// -----------------------------------------------------------------------------Muting-----------------------------------------------------------------------------
+
+ if(Bright1 > 0){Bright1 = (Bright1 - FadeFactor); DmxSimple.write(1, Bright1);}
+ if(Bright1 == 0 && S1State == 0)
+
+ if(Bright2 > 0){Bright2 = (Bright2 - FadeFactor); DmxSimple.write(2, Bright1);}
+
+
+ if(S1State == 0){
+  if(NewTime >= (Time1 + NoteSustain)){MIDI.sendNoteOff(Note1, 0, MidiChan);MIDI.sendNoteOff(Note2, 0, MidiChan);} }
+
+ if(S2State == 0){
+  if(NewTime >= (Time2 + NoteSustain)){MIDI.sendNoteOff(Note3, 0, MidiChan);MIDI.sendNoteOff(Note4, 0, MidiChan);} }
+
+ if(S3State == 0){
+  if(NewTime >= (Time3 + NoteSustain)){MIDI.sendNoteOff(Note5, 0, MidiChan);MIDI.sendNoteOff(Note6, 0, MidiChan);} }
+
+ if(S4State == 0){
+  if(NewTime >= (Time4 + NoteSustain)){MIDI.sendNoteOff(Note7, 0, MidiChan);MIDI.sendNoteOff(Note8, 0, MidiChan);} }
+
+ if(S5State == 0){
+  if(NewTime >= (Time5 + NoteSustain)){MIDI.sendNoteOff(Note9, 0, MidiChan);MIDI.sendNoteOff(Note10, 0, MidiChan);} }
+
+ if(S6State == 0){
+  if(NewTime >= (Time6 + NoteSustain)){MIDI.sendNoteOff(Note11, 0, MidiChan);MIDI.sendNoteOff(Note12, 0, MidiChan);} }
+
+ if(S7State == 0){
+  if(NewTime >= (Time7 + NoteSustain)){MIDI.sendNoteOff(Note13, 0, MidiChan);MIDI.sendNoteOff(Note14, 0, MidiChan);} }
+
+ if(S8State == 0){
+  if(NewTime >= (Time8 + NoteSustain)){MIDI.sendNoteOff(Note15, 0, MidiChan);MIDI.sendNoteOff(Note16, 0, MidiChan);} }
+
+ LastS1State = S1State;
+ LastS2State = S2State;
+ LastS3State = S3State;
+ LastS4State = S4State;
+ LastS5State = S5State;
+ LastS6State = S6State;
+ LastS7State = S7State;
+ LastS8State = S8State;
+
+ delay (10);
+ }
+
